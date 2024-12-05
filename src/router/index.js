@@ -18,9 +18,8 @@ const routes = [
     },
     {
         name: 'channel',
-        path: '/channels/:name',
+        path: '/channels/:id',
         component: ChannelDetails,
-        props: true,
     },
     {
         name: 'games',
