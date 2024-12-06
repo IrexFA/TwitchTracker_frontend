@@ -1,22 +1,26 @@
 <template>
     <!-- header -->
-    <div class="bg-gray-800 p-8 flex gap-8 w-full">
-        <img :src="data.image_url.replace('{width}', '210').replace('{height}', '280')" alt="game image"
-            class="mx-right w-48 h-64 rounded" :class="{ 'animate-pulse': !data.id }" />
-        <div class="w-full">
-            <h1 class="text-3xl font-bold mb-4 container mx-auto text-white flex items-center gap-2">
-                <span>Game:</span>
-                <span v-if="data.name" class="">{{ data.name }}</span>
-                <div v-else class="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48"></div>
-            </h1>
-            <div class="flex w-full justify-left gap-10">
-                <DataCard name="Live viewers" :data="data.live_viewers" />
-                <DataCard name="Live channels" :data="data.live_channels" />
+    <div class="flex flex-col items-center">
+        <div class="bg-gray-800 p-8 flex gap-8 w-full">
+            <img :src="data.image_url.replace('{width}', '210').replace('{height}', '280')" alt="game image"
+                class="mx-right w-48 h-64 rounded" :class="{ 'animate-pulse': !data.id }" />
+            <div class="w-full">
+                <h1 class="text-3xl font-bold mb-4 container text-white flex items-center gap-2">
+                    <span>Game:</span>
+                    <span v-if="data.name" class="">{{ data.name }}</span>
+                    <div v-else class="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48"></div>
+                </h1>
+                <div class="flex w-full justify-left gap-10">
+                    <DataCard name="Live viewers" :data="data.live_viewers" />
+                    <DataCard name="Live channels" :data="data.live_channels" />
+                </div>
             </div>
         </div>
+        <!-- content -->
+        <div class="w-3/4 h-max flex justify-center">
+            <Line :data="chartData" :options="chartOptions" />
+        </div>
     </div>
-    <!-- content -->
-    <Line :data="chartData" :options="chartOptions" class="w-full h-96" />
 
 </template>
 
@@ -27,7 +31,11 @@ import api from '../api';
 import DataCard from './DataCard.vue';
 
 import {
-    BarElement, PointElement, LineElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip
+    BarElement,
+    CategoryScale, Chart as ChartJS, Legend, LinearScale,
+    LineElement,
+    PointElement,
+    Title, Tooltip
 } from 'chart.js';
 import { Line } from 'vue-chartjs';
 
@@ -49,21 +57,32 @@ const defaultData = {
 };
 const data = ref(defaultData);
 const toChartData = (data) => {
-    const labels = data.records.map(record => new Date(record.timestamp).toLocaleString());
+    const labelToData = data.records.reduce((acc, record) => {
+        const dateString = new Date(record.timestamp).toDateString();
+        if (!acc[dateString]) {
+            acc[dateString] = { total_viewers: 0, total_streams: 0, count: 0 };
+        }
+        acc[dateString].total_viewers += record.total_viewers;
+        acc[dateString].total_streams += record.total_streams;
+        acc[dateString].count += 1;
+        return acc;
+    }, {});
+    console.log(labelToData);
+    const labels = Object.keys(labelToData);
     const datasets = [
         {
-            label: 'Total viewers',
-            data: data.records.map(record => record.total_viewers),
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            label: 'Average viewers',
+            data: labels.map(label => labelToData[label].total_viewers / labelToData[label].count),
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
             borderColor: 'rgba(255, 99, 132, 1)',
-            borderWidth: 2
+            yAxisID: 'y1'
         },
         {
-            label: 'Total streams',
-            data: data.records.map(record => record.total_streams),
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            label: 'Average streams',
+            data: labels.map(label => labelToData[label].total_streams / labelToData[label].count),
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
             borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1
+            yAxisID: 'y2'
         }
     ];
     return { labels, datasets };
@@ -71,21 +90,36 @@ const toChartData = (data) => {
 const chartData = ref(toChartData(defaultData));
 const chartOptions = ref({
     responsive: true,
+    interaction: {
+        mode: 'index',
+        intersect: false,
+    },
     plugins: {
         legend: { display: true },
         tooltip: { enabled: true },
     },
     scales: {
         x: {
-            title: { display: true, text: "Streams" },
+            title: { display: true, text: "Date" },
         },
-        y: {
-            title: { display: true, text: "Count" },
+        y1: {
+            title: { display: true, text: "Viewers" },
+            position: 'left'
+        },
+        y2: {
+            title: { display: true, text: "Streams" },
+            position: 'right',
+            // grid line settings
+            grid: {
+                drawOnChartArea: false, // only want the grid lines for one axis to show up
+            },
         },
     }
 });
 api.get(`/games/${id}`).then(response => {
     data.value = response.data;
     chartData.value = toChartData(data.value);
+    console.log(chartData);
+
 });
 </script>
