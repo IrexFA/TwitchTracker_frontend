@@ -1,8 +1,9 @@
 <template>
     <div class="flex flex-col items-center">
+        <!-- header -->
         <div class="bg-gray-800 p-8 flex gap-8 w-full">
-            <img :src="data.image_url.replace('{width}', '210').replace('{height}', '280')" alt="game image"
-                class="mx-right w-48 h-64 rounded" :class="{ 'animate-pulse': !data.id }" />
+            <img :src="data.image_url" alt="game image" class="mx-right w-48 h-64 rounded"
+                :class="{ 'animate-pulse': !data.id }" />
             <div class="w-full">
                 <h1 class="text-3xl font-bold mb-4 container text-white flex items-center gap-2">
                     <span>Game:</span>
@@ -20,7 +21,6 @@
             <Line :data="chartData" :options="chartOptions" />
         </div>
     </div>
-
 </template>
 
 <script setup>
@@ -117,5 +117,7 @@ const chartOptions = ref({
 api.get(`/games/${id}`).then(response => {
     data.value = response.data;
     chartData.value = toChartData(data.value);
+}).catch(error => {
+    console.error("Error while fetching data:", error);
 });
 </script>
