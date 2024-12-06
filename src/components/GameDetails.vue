@@ -1,5 +1,4 @@
 <template>
-    <!-- header -->
     <div class="flex flex-col items-center">
         <div class="bg-gray-800 p-8 flex gap-8 w-full">
             <img :src="data.image_url.replace('{width}', '210').replace('{height}', '280')" alt="game image"
@@ -16,7 +15,7 @@
                 </div>
             </div>
         </div>
-        <!-- content -->
+
         <div class="w-3/4 h-max flex justify-center">
             <Line :data="chartData" :options="chartOptions" />
         </div>
@@ -67,7 +66,6 @@ const toChartData = (data) => {
         acc[dateString].count += 1;
         return acc;
     }, {});
-    console.log(labelToData);
     const labels = Object.keys(labelToData);
     const datasets = [
         {
@@ -119,7 +117,5 @@ const chartOptions = ref({
 api.get(`/games/${id}`).then(response => {
     data.value = response.data;
     chartData.value = toChartData(data.value);
-    console.log(chartData);
-
 });
 </script>

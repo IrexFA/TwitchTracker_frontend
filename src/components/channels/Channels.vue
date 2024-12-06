@@ -53,9 +53,9 @@ const itemsPerPage = 10;
 
 const fetchPage = async (page) => {
   try {
-    const response = await api.get(`/channels?page=${page}&limit=${itemsPerPage}`);
+    const response = await api.get(`/channels?page=${page}`);
     channels.value = response.data.data;
-    totalPages.value = Math.ceil(response.data.meta.totalItems / itemsPerPage);
+    totalPages.value = response.data.meta.totalPages;
     currentPage.value = page;
   } catch (error) {
     console.error("Erreur lors de la récupération des données :", error);

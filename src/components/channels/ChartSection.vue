@@ -1,5 +1,6 @@
 <template>
     <div>
+        <h2 class="text-2xl font-semibold mb-4">Streams performance</h2>
         <Line id="my-chart-id" :data="chartData" :options="chartOptions" />
     </div>
 </template>

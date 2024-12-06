@@ -9,7 +9,6 @@
 </template>
 
 <script setup>
-// name passed from parent component
 const props = defineProps({
     name: String,
     data: String,

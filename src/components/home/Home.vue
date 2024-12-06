@@ -58,10 +58,10 @@ const fetchAllChannels = async () => {
 
 const fetchAllData = async () => {
     try {
-        const gamesResponse = await api.get("/games");
+        const gamesResponse = await api.get("/games?limit=200");
         const activeChannelsResponse = await api.get("/channels/active");
 
-        allGames.value = gamesResponse.data;
+        allGames.value = gamesResponse.data.data;
         uniqueGames.value = allGames.value.length;
         totalViewers.value = allGames.value.reduce((sum, game) => sum + game.currentViewers, 0);
 
