@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import GameDetails from '../components/GameDetails.vue'
-import ChannelDetails from '/src/components/ChannelDetails.vue'
-import Channels from '/src/components/Channels.vue'
+import ChannelDetails from '/src/components/channels/ChannelDetails.vue'
+import Channels from '/src/components/channels/Channels.vue'
 import Games from '/src/components/Games.vue'
-import Home from '/src/components/Home.vue'
+import Home from '/src/components/home/Home.vue'
 
 const routes = [
     {
