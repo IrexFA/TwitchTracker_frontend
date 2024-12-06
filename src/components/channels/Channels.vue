@@ -49,13 +49,14 @@ const router = useRouter();
 const channels = ref([]);
 const currentPage = ref(1);
 const totalPages = ref(1);
-const itemsPerPage = 10;
+const itemsPerPage = ref(1);
 
 const fetchPage = async (page) => {
   try {
     const response = await api.get(`/channels?page=${page}`);
     channels.value = response.data.data;
     totalPages.value = response.data.meta.totalPages;
+    itemsPerPage.value = response.data.meta.perPage;
     currentPage.value = page;
   } catch (error) {
     console.error("Erreur lors de la récupération des données :", error);
