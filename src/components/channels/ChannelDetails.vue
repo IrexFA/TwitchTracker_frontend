@@ -47,7 +47,9 @@ const fetchChannelDetails = async () => {
     channel.value = response.data;
 
     if (channel.value.streams && channel.value.streams.length > 0) {
-      recentStreams.value = channel.value.streams.map((stream) => {
+      const streamsByDate = new Map();
+
+      channel.value.streams.forEach((stream) => {
         const startDate = new Date(stream.start_date);
         const endDate = stream.end_date ? new Date(stream.end_date) : new Date();
 
@@ -73,16 +75,22 @@ const fetchChannelDetails = async () => {
         const averageViewers = totalViewers / (stream.streams_records?.length || 1);
         const hoursStreamed = ((endDate - startDate) / (1000 * 60 * 60)).toFixed(1);
 
-        return {
-          streamId: stream.id,
-          start: formatDate(stream.start_date),
-          end: stream.end_date,
-          followersGained,
-          hoursStreamed,
-          maxViewers,
-          averageViewers: Math.round(averageViewers),
-        };
+        const streamDate = startDate.toISOString().split("T")[0];
+
+        if (!streamsByDate.has(streamDate)) {
+          streamsByDate.set(streamDate, {
+            streamId: stream.id,
+            start: formatDate(stream.start_date),
+            end: stream.end_date,
+            followersGained,
+            hoursStreamed,
+            maxViewers,
+            averageViewers: Math.round(averageViewers),
+          });
+        }
       });
+
+      recentStreams.value = Array.from(streamsByDate.values());
 
       chartData.value = {
         labels: recentStreams.value.map((data) => `${data.start}`),
@@ -128,9 +136,7 @@ const fetchChannelDetails = async () => {
     }
 
     if (channel.value.records && channel.value.records.length > 0) {
-      const records = channel.value.records;
-
-      const dailyFollowers = records.reduce((acc, record) => {
+      const dailyFollowers = channel.value.records.reduce((acc, record) => {
         const date = new Date(record.timestamp).toISOString().split("T")[0];
         if (!acc[date]) {
           acc[date] = record.followers_count;
@@ -184,6 +190,7 @@ const fetchChannelDetails = async () => {
     isLoading.value = false;
   }
 };
+
 
 
 const formatDate = (date) => new Date(date).toDateString();
