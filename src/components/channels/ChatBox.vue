@@ -57,7 +57,8 @@ const toggleChat = () => {
 };
 
 onMounted(() => {
-    socket.value = io("http://127.0.0.1:4567");
+
+    socket.value = io("https://twitchtracker-production.up.railway.app");
 
     socket.value.emit("joinRoom", { channelId: props.channelId });
 
