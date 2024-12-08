@@ -1,7 +1,6 @@
 <template>
     <div class="bg-white text-gray-900 py-12">
         <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Top Streamed Games -->
             <div>
                 <table class="min-w-full table-auto text-sm">
                     <thead class="border-gray-200">
@@ -24,7 +23,6 @@
                 </table>
             </div>
 
-            <!-- Top Live Channels -->
             <div>
                 <table class="min-w-full table-auto text-sm">
                     <thead class="border-gray-200">
